@@ -33,7 +33,13 @@ def HandleInput(input):
         return
     
     if input == 1:
-        Utils.search4saves()
+        Utils.saves = Utils.search4saves()
+        print("the following was found:")
+        if not Utils.saves:
+            print("empty....")
+            return
+        for i, save in enumerate(Utils.saves):
+            print(f"{i}. {save}")
         return
     elif input == 2:
         if not Utils.saves:
