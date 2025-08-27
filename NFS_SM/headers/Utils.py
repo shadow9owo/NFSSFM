@@ -92,12 +92,7 @@ def search4saves():
     saves = []
     found_set = set()
 
-    try:
-        scan_type = selectedscantype
-    except NameError:
-        scan_type = None
-
-    if scan_type == selectedaction_scan.ALLDISKS:
+    if selectedscantype == selectedaction_scan.ALLDISKS:
         cwd = os.getcwd()
         print(f"starting in cwd: {cwd}", flush=True)
 
@@ -108,7 +103,7 @@ def search4saves():
         else:
             search_dirs = ["/"]
 
-    elif scan_type == selectedaction_scan.CUSTOMPATH:
+    elif selectedscantype == selectedaction_scan.CUSTOMPATH:
         if not customscanroot:
             print("invalid customroot :(", flush=True)
             return []
@@ -153,7 +148,7 @@ def search4saves():
                             print(f"err ({filepath}): {e}", flush=True)
                         continue
 
-            if scan_type == selectedaction_scan.CUSTOMPATH:
+            if selectedscantype == selectedaction_scan.CUSTOMPATH:
                 return saves
             
     except Exception as e:

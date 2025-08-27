@@ -17,7 +17,7 @@ def applyselectedaction(path):
 usagetick = 0 # clear at 5 clearing is pretty heavy for the system
 
 def ChoosePath():
-    global customscanroot
+    global customscanroot,selectedscantype
     _input = 0
     __input = ""
     invalid = True
@@ -27,7 +27,7 @@ def ChoosePath():
             _input = int(input("select an option >> "))
             if _input == 1:
                 invalid = False
-                selectedscantype = Utils.selectedaction_scan.ALLDISKS
+                Utils.selectedscantype = Utils.selectedaction_scan.ALLDISKS
                 return
             elif _input == 2:
                 selectedscantype = Utils.selectedaction_scan.CUSTOMPATH
@@ -39,12 +39,15 @@ def ChoosePath():
 
     invalid = True
 
+    print("input CUSTOMPATH:\n")
     while invalid:
-        __input = input()
+        __input = input("select an option >> ")
         if os.path.isdir(__input):
-            customscanroot = __input
+            Utils.customscanroot = __input
+            Utils.selectedscantype = Utils.selectedaction_scan.CUSTOMPATH
             invalid = False
-            print(__input + " selected")
+            print(Utils.customscanroot + " selected")
+    input()
 
     return
 
