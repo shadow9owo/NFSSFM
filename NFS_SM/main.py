@@ -10,7 +10,10 @@ def applyselectedaction(path):
     if selectedactionint == Utils.selectedaction.Backup:
         shutil.copyfile(path, os.path.join(os.getcwd(),"backups", os.path.basename(path) + ".bak"))
     elif selectedactionint == Utils.selectedaction.Delete:
+        if path in Utils.saves:
+            Utils.saves.remove(path)
         os.remove(path)
+        Utils.savepath()
 
     return
 
@@ -135,7 +138,7 @@ def HandleInput(___input):
             for save_file in Utils.saves:
              applyselectedaction(save_file)
         else:
-            applyselectedaction(Utils.saves[_input])
+            applyselectedaction(Utils.saves[int(_input)])
         return
     elif ___input == 5:
         running = False
