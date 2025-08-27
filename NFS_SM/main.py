@@ -68,6 +68,8 @@ def HandleInput(input):
         if not Utils.saves:
             print("empty....")
             return
+        else:
+            Utils.savepath()
         for i, save in enumerate(Utils.saves):
             print(f"{i}. {save}")
         return
@@ -148,6 +150,7 @@ def main():
 #Utils.search4saves
     if found:
         print("config.ini was found")
+        Utils.loadpath()
     else:
         print("no config.ini was found")
 
