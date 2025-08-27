@@ -6,22 +6,47 @@ import shutil
 found = False
 running = True
 
-class selectedaction(Enum):
-    Nul = 0
-    Delete = 1
-    Backup = 2 
-
-selectedactionint = selectedaction.Nul
-
 def applyselectedaction(path):
-    if selectedactionint == selectedaction.Backup:
+    if selectedactionint == Utils.selectedaction.Backup:
         shutil.copyfile(path, path + ".bak")
-    elif selectedactionint == selectedaction.Delete:
+    elif selectedactionint == Utils.selectedaction.Delete:
         os.remove(path)
 
     return
 
 usagetick = 0 # clear at 5 clearing is pretty heavy for the system
+
+def ChoosePath():
+    global customscanroot
+    _input = 0
+    __input = ""
+    invalid = True
+    print("Possible scan types:\n1. SCAN ALL DISKS (slow)\n2. CUSTOM SCAN (fast)")
+    while invalid:
+        try:
+            _input = int(input("select an option >> "))
+            if _input == 1:
+                invalid = False
+                selectedscantype = Utils.selectedaction_scan.ALLDISKS
+                return
+            elif _input == 2:
+                selectedscantype = Utils.selectedaction_scan.CUSTOMPATH
+                invalid = False
+            else:
+                return
+        except ValueError:
+            print("invalid input")
+
+    invalid = True
+
+    while invalid:
+        __input = input()
+        if os.path.isdir(__input):
+            customscanroot = __input
+            invalid = False
+            print(__input + " selected")
+
+    return
 
 def HandleInput(input):
     _input = 0
@@ -33,6 +58,8 @@ def HandleInput(input):
         return
     
     if input == 1:
+        ChoosePath()
+
         Utils.saves = Utils.search4saves()
         print("the following was found:")
         if not Utils.saves:
@@ -62,7 +89,7 @@ def HandleInput(input):
             except ValueError:
                 print("invalid input")
             
-        selectedactionint = selectedaction.Backup
+        selectedactionint = Utils.selectedaction.Backup
         applyselectedaction(Utils.saves[_input])
         return
     elif input == 4:
@@ -79,7 +106,7 @@ def HandleInput(input):
             except ValueError:
                 print("invalid input")
             
-        selectedactionint = selectedaction.Delete
+        selectedactionint = Utils.selectedaction.Delete
         applyselectedaction(Utils.saves[_input])
         return
     elif input == 5:
@@ -126,6 +153,6 @@ def main():
             Utils.clearconsole()
         menu()
         usagetick = usagetick + 1
-        selectedactionint = selectedaction.Nul
+        selectedactionint = Utils.selectedaction.Nul
 
 main()

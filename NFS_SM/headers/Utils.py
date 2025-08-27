@@ -3,6 +3,8 @@ import os
 from headers import ini
 import platform
 
+customscanroot = ""
+
 class ErrorCodes(Enum):
     Success = 0
     Failed = 1
@@ -17,7 +19,19 @@ debug = False # switch this to get spammed :)
 validationkey_frostbite = b"NFSS" # Unbound , payback , heat , all frostbite games basically
 validationkey_blackbox = b"20CMl" # NFSMW2004
 
-validationfilekeyword = ["nfs","save"] # NFSHP 2010 && 2020 && mw 2012
+validationfilekeyword = ["nfs"] # NFSHP 2010 && 2020 && mw 2012
+
+class selectedaction(Enum):
+    Nul = 0
+    Delete = 1
+    Backup = 2 
+
+class selectedaction_scan(Enum):
+    ALLDISKS = 0
+    CUSTOMPATH = 1
+
+selectedscantype = selectedaction_scan.ALLDISKS
+selectedactionint = selectedaction.Nul
 
 saves = []
 
@@ -78,25 +92,53 @@ def search4saves():
     saves = []
     found_set = set()
 
-    cwd = os.getcwd()
-    print(f"starting {cwd}")
+    try:
+        scan_type = selectedscantype
+    except NameError:
+        scan_type = None
 
-    os_name = platform.system().lower()
-    if os_name == "windows":
-        drives = [f"{d}:\\" for d in "ABCDEFGHIJKLMNOPQRSTUVWXYZ" if os.path.exists(f"{d}:\\")]
-        search_dirs = drives
+    if scan_type == selectedaction_scan.ALLDISKS:
+        cwd = os.getcwd()
+        print(f"starting in cwd: {cwd}", flush=True)
+
+        os_name = platform.system().lower()
+        if os_name == "windows":
+            drives = [f"{d}:\\" for d in "ABCDEFGHIJKLMNOPQRSTUVWXYZ" if os.path.exists(f"{d}:\\")]
+            search_dirs = drives if drives else [cwd]
+        else:
+            search_dirs = ["/"]
+
+    elif scan_type == selectedaction_scan.CUSTOMPATH:
+        if not customscanroot:
+            print("invalid customroot :(", flush=True)
+            return []
+
+        if not os.path.isdir(customscanroot):
+            print(f"{customscanroot}. isnt a valid dir.", flush=True)
+            return []
+        else:
+            search_dirs = [customscanroot]
+
+        print(f"starting {search_dirs[0]}", flush=True)
     else:
-        search_dirs = ["/"]
+        cwd = os.getcwd()
+        search_dirs = [cwd]
+        print(f"the fuck???: {cwd}", flush=True)
 
     def onerror(err):
         if debug:
-            print(f"Error accessing {getattr(err, 'filename', 'unknown')}: {err}")
+            print(f"accessing {getattr(err, 'filename', 'unknown')}: {err}", flush=True)
 
-    for base_dir in search_dirs:
-        print(f"Scanning base: {base_dir}")
-        try:
+    try:
+        for base_dir in search_dirs:
+            print(f"scanning {base_dir}", flush=True)
+            if not os.path.isdir(base_dir):
+                if debug:
+                    print(f"skipping {base_dir}", flush=True)
+                continue
+
             for root, dirs, files in os.walk(base_dir, onerror=onerror, followlinks=False):
-                print(f"scanning: {root}")
+                print(f"scanning {root}", flush=True)
                 for file in files:
                     filepath = os.path.join(root, file)
                     try:
@@ -105,15 +147,17 @@ def search4saves():
                                 found_set.add(filepath)
                                 saves.append(filepath)
                                 if debug:
-                                    print(f"found: {filepath}")
-                    except Exception:
+                                    print(f"found {filepath}", flush=True)
+                    except Exception as e:
+                        if debug:
+                            print(f"err ({filepath}): {e}", flush=True)
                         continue
-        except Exception as e:
-            if debug:
-                print(f"err {base_dir}: {e}")
+
+            if scan_type == selectedaction_scan.CUSTOMPATH:
+                return saves
+            
+    except Exception as e:
+        if debug:
+            print(f"err {e}", flush=True)
 
     return saves
-
-def clearconsole():
-    os.system('cls' if os.name == 'nt' else 'clear')
-    return
