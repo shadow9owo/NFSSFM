@@ -1,4 +1,3 @@
-
 from enum import Enum
 import os
 from headers import ini
@@ -77,6 +76,10 @@ def savepath():
 def search4saves():
     global saves
     saves = []
+    found_set = set()
+
+    cwd = os.getcwd()
+    print(f"starting {cwd}")
 
     os_name = platform.system().lower()
     if os_name == "windows":
@@ -85,17 +88,30 @@ def search4saves():
     else:
         search_dirs = ["/"]
 
+    def onerror(err):
+        if debug:
+            print(f"Error accessing {getattr(err, 'filename', 'unknown')}: {err}")
+
     for base_dir in search_dirs:
-        for root, dirs, files in os.walk(base_dir):
-            for file in files:
-                filepath = os.path.join(root, file)
-                try:
-                    if validate_savefile(filepath) == ErrorCodes.Success:
-                        saves.append(filepath)
-                        if debug:
-                            print(f"found {filepath}")
-                except Exception:
-                    continue
+        print(f"Scanning base: {base_dir}")
+        try:
+            for root, dirs, files in os.walk(base_dir, onerror=onerror, followlinks=False):
+                print(f"scanning: {root}")
+                for file in files:
+                    filepath = os.path.join(root, file)
+                    try:
+                        if validate_savefile(filepath) == ErrorCodes.Success:
+                            if filepath not in found_set:
+                                found_set.add(filepath)
+                                saves.append(filepath)
+                                if debug:
+                                    print(f"found: {filepath}")
+                    except Exception:
+                        continue
+        except Exception as e:
+            if debug:
+                print(f"err {base_dir}: {e}")
+
     return saves
 
 def clearconsole():
