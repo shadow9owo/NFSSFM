@@ -8,7 +8,7 @@ running = True
 
 def applyselectedaction(path):
     if selectedactionint == Utils.selectedaction.Backup:
-        shutil.copyfile(path, path + ".bak")
+        shutil.copyfile(path, os.path.join(os.getcwd(),"backups", os.path.basename(path) + ".bak"))
     elif selectedactionint == Utils.selectedaction.Delete:
         os.remove(path)
 
@@ -17,8 +17,7 @@ def applyselectedaction(path):
 usagetick = 0 # clear at 5 clearing is pretty heavy for the system
 
 def ChoosePath():
-    global customscanroot,selectedscantype
-    _input = 0
+    global selectedscantype
     __input = ""
     invalid = True
     print("Possible scan types:\n1. SCAN ALL DISKS (slow)\n2. CUSTOM SCAN (fast)")
@@ -51,16 +50,15 @@ def ChoosePath():
 
     return
 
-def HandleInput(input):
-    _input = 0
+def HandleInput(___input):
     invalid = True
     global running, selectedactionint # i hate python why cant everything be global by default
 
-    if type(input) != int:
+    if type(___input) != int:
         print("invalid input")
         return
     
-    if input == 1:
+    if ___input == 1:
         ChoosePath()
 
         Utils.saves = Utils.search4saves()
@@ -73,48 +71,73 @@ def HandleInput(input):
         for i, save in enumerate(Utils.saves):
             print(f"{i}. {save}")
         return
-    elif input == 2:
+    elif ___input == 2:
         if not Utils.saves:
             print("empty....")
             return
         for i, save in enumerate(Utils.saves):
             print(f"{i}. {save}")
         return
-    elif input == 3:
+    elif ___input == 3:
         if not Utils.saves:
             print("empty....")
             return
         for i, save in enumerate(Utils.saves):
             print(f"{i}. {save}")
 
+        print("input \'*\' to backup everything")
         while invalid:
             try:
-                _input = int(input("select an option >> "))
-                invalid = False
+                _input = input("select an option >> ")
+                if _input == "*":
+                    invalid = False
+                elif Utils.is_int(_input):
+                    invalid = False
+                elif type(_input) == int:
+                    invalid = False
+                else:
+                    raise ValueError
             except ValueError:
                 print("invalid input")
             
         selectedactionint = Utils.selectedaction.Backup
-        applyselectedaction(Utils.saves[_input])
+        if _input == "*":
+            for save_file in Utils.saves:
+             applyselectedaction(save_file)
+        else:
+            applyselectedaction(Utils.saves[int(_input)])
         return
-    elif input == 4:
+    elif ___input == 4:
         if not Utils.saves:
             print("empty....")
             return
         for i, save in enumerate(Utils.saves):
             print(f"{i}. {save}")
 
+        print("input \'*\' to delete everything")
+
         while invalid:
             try:
-                _input = int(input("select an option >> "))
-                invalid = False
+                _input = input("select an option >> ")
+                if _input == "*":
+                    invalid = False
+                elif Utils.is_int(_input):
+                    invalid = False
+                elif type(_input) == int:
+                    invalid = False
+                else:
+                    raise ValueError
             except ValueError:
                 print("invalid input")
             
         selectedactionint = Utils.selectedaction.Delete
-        applyselectedaction(Utils.saves[_input])
+        if _input == "*":
+            for save_file in Utils.saves:
+             applyselectedaction(save_file)
+        else:
+            applyselectedaction(Utils.saves[_input])
         return
-    elif input == 5:
+    elif ___input == 5:
         running = False
         return
 
@@ -124,8 +147,8 @@ def menu():
     global _input
     print("1 - search for save files")
     print("2 - list save files")
-    print("3 - backup save file")
-    print("4 - delete save file")
+    print("3 - backup save file(s)")
+    print("4 - delete save file(s)")
     print("5 - exit")
 
     try:
@@ -142,6 +165,9 @@ def menu():
 def main():
     global usagetick,selectedactionint
     found = os.path.isfile(ini.filename)
+    
+    if not os.path.exists(os.path.join(os.getcwd(),"backups")):
+        os.mkdir("backups")
 
     print(
         "\nNFS_SFM\nneed for speed save file manager\nver 0.1\n"

@@ -35,9 +35,19 @@ selectedactionint = selectedaction.Nul
 
 saves = []
 
+def is_int(s):
+    """Return True if s can be converted to int, else False."""
+    try:
+        int(s)
+        return True
+    except ValueError:
+        return False
+
 #nothing here matters as long as it returns success
 def validate_savefile(file):
     try:
+        if os.path.basename(file).lower().endswith(".bak"): #exclude backups
+            return ErrorCodes.Failed
         with open(file, "rb") as f:
             header = f.read(len(validationkey_frostbite))  # read first 4 bytes
             if header == validationkey_frostbite:
