@@ -58,6 +58,7 @@ def validate_savefile(file):
             if header == validationkey_blackbox:
                 return ErrorCodes.Success
             f.seek(0)
+            header = f.read(len(validationkey_ghost)) 
             if header == validationkey_ghost:
                 return ErrorCodes.Success
             else:
