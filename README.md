@@ -8,6 +8,6 @@ Heat - tested<br>
 Payback - tested<br>
 Hot pursuit && original and remastered - tested<br>
 Most Wanted 2012 && 2004 - tested<br>
-Rivals - tested
+Rivals - tested<br>
 <br>
 Tested on Windows (should work on linux)
