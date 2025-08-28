@@ -19,8 +19,8 @@ debug = False # switch this to get spammed :)
 validationkey_frostbite = b"NFSS" # Unbound , payback , heat , all frostbite games basically
 validationkey_blackbox = b"20CMl" # NFSMW2004
 validationkey_ghost = bytes([0xDB, 0x38, 0x64, 0x7E]) # rivals
-
-validationfilekeyword = ["nfs"] # NFSHP 2010 && 2020 && mw 2012
+validationkey_mw2012 = bytes([0x00, 0xD8, 0x03, 0x00]) # NFSMW2012
+validationkey_hotpursuit = bytes([0x00, 0x00, 0x04, 0x00]) # NFSHPRM
 
 class selectedaction(Enum):
     Nul = 0
@@ -61,12 +61,16 @@ def validate_savefile(file):
             header = f.read(len(validationkey_ghost)) 
             if header == validationkey_ghost:
                 return ErrorCodes.Success
+            f.seek(0)
+            header = f.read(len(validationkey_mw2012)) 
+            if header == validationkey_mw2012:
+                return ErrorCodes.Success
+            f.seek(0)
+            header = f.read(len(validationkey_hotpursuit)) 
+            if header == validationkey_hotpursuit:
+                return ErrorCodes.Success
             else:
-                filename_lower = os.path.basename(file).lower() 
-                if any(keyword in filename_lower for keyword in validationfilekeyword):
-                    return ErrorCodes.Success
-                else:
-                    return ErrorCodes.Failed
+                return ErrorCodes.Failed
     except Exception as e:
         if (debug):
             print(f"{e}")
