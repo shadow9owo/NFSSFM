@@ -18,6 +18,7 @@ debug = False # switch this to get spammed :)
 
 validationkey_frostbite = b"NFSS" # Unbound , payback , heat , all frostbite games basically
 validationkey_blackbox = b"20CMl" # NFSMW2004
+validationkey_ghost = bytes([0xDB, 0x38, 0x64, 0x7E]) # rivals
 
 validationfilekeyword = ["nfs"] # NFSHP 2010 && 2020 && mw 2012
 
@@ -55,6 +56,9 @@ def validate_savefile(file):
             f.seek(0)
             header = f.read(len(validationkey_blackbox))
             if header == validationkey_blackbox:
+                return ErrorCodes.Success
+            f.seek(0)
+            if header == validationkey_ghost:
                 return ErrorCodes.Success
             else:
                 filename_lower = os.path.basename(file).lower() 
