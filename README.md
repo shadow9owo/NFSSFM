@@ -6,7 +6,7 @@ supports : <br>
 Unbound - tested<br>
 Heat - tested<br>
 Payback - tested<br>
-Hot pursuit && original and remastered - tested<br>
+Hot pursuit remastered - tested<br>
 Most Wanted 2012 && 2004 - tested<br>
 Rivals - tested<br>
 <br>
